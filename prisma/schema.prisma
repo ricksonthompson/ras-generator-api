@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model DescriptiveReport {
+  id                    String                @unique @db.Uuid
+  description           String
+  evidence              Evidence[]
+  createdAt             DateTime              @default(now()) @db.Timestamp
+  updatedAt             DateTime?             @db.Timestamp
+}
+
+model Employee {
+  id                    String                @unique @db.Uuid
+  name                  String
+  email                 String
+  occupation            String
+  ras                   Ras[]
+  createdAt             DateTime              @default(now()) @db.Timestamp
+  updatedAt             DateTime?             @db.Timestamp
+}
+
+model Evidence {
+  id                    String                @unique @db.Uuid
+  bannerId              String                @db.Uuid
+  descriptionReport     DescriptiveReport     @relation(fields: [descriptiveReportId], references: [id], onDelete: Cascade)
+  descriptiveReportId   String                @db.Uuid
+  ras                   Ras?                  @relation(fields: [rasId], references: [id], onDelete: Cascade)
+  rasId                 String?               @db.Uuid
+  createdAt             DateTime              @default(now()) @db.Timestamp
+  updatedAt             DateTime?             @db.Timestamp
+}
+
+model Project {
+  id                    String                @unique @db.Uuid
+  title                 String
+  ras                   Ras[]
+  createdAt             DateTime              @default(now()) @db.Timestamp
+  updatedAt             DateTime?             @db.Timestamp
+}
+
+model Ras {
+  id                    String                @unique @db.Uuid
+  title                 String
+  project               Project               @relation(fields: [projectId], references: [id])
+  projectId             String                @db.Uuid
+  technicalCoordinator  String
+  employee              Employee              @relation(fields: [employeeId], references: [id])
+  employeeId            String                @db.Uuid
+  period                String
+  evidence              Evidence[]
+  createdAt             DateTime              @default(now()) @db.Timestamp
+  updatedAt             DateTime?             @db.Timestamp
+}
